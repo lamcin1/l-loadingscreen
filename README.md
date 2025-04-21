@@ -1,4 +1,4 @@
-# FiveM Loading Screen
+# l-loadingscreen
 
 A customizable and interactive loading screen for FiveM that features an engaging user interface with background video, volume control, social media links, a team modal, and a useful tips section.
 

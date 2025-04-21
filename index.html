@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FiveM Loading</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+
+        video.bg-video {
+            position: fixed; 
+            top: 0; 
+            left: 0;
+            width: 100vw;
+            height: 100vh; 
+            object-fit: cover;
+            z-index: -1; 
+        }
+
+        .server-logo {
+            position: fixed; 
+            top: 20px; 
+            left: 20px;  
+            width: 100px;
+            height: auto;
+            z-index: 10;
+        }
+
+        
+        @media (max-width: 768px) {
+            .server-logo {
+                width: 80px;  
+                top: 10px;  
+                left: 10px; 
+            }
+        }
+
+        .mute-button-container {
+            position: absolute;
+            top: 120px; 
+            left: 20px; 
+            z-index: 10;
+        }
+
+
+        .mute-button,
+        .social-buttons a,
+        .show-video-btn {
+            background-color: rgba(0, 0, 0, 0.7); 
+            color: white; 
+            padding: 10px 20px;
+            border-radius: 10px; 
+            cursor: pointer; 
+            border: none; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+            .mute-button:hover,
+            .social-buttons a:hover,
+            .show-video-btn:hover {
+                background-color: rgba(0, 0, 0, 0.9); 
+                transform: scale(1.1); 
+            }
+
+            .volume-slider-container {
+                position: fixed; 
+                bottom: 70px;    
+                left: 20px;      
+                z-index: 50;
+                background: rgba(0, 0, 0, 0.5);
+                padding: 10px 20px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start; 
+                height: 50px; 
+            }
+
+            .volume-slider {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 200px; 
+                height: 8px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 10px;
+                cursor: pointer;
+                margin-left: 15px;
+            }
+
+            .volume-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 20px;
+                height: 20px;
+                background: white;
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+            }
+
+            .volume-slider::-moz-range-thumb {
+                width: 20px;
+                height: 20px;
+                background: white;
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+            }
+
+            .mute-button {
+                background-color: rgba(0, 0, 0, 0.7);
+                color: white;
+                padding: 14px;
+                border-radius: 50%;
+                cursor: pointer;
+                border: none;
+                font-size: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 40px;
+                height: 40px;
+                margin-left: 0; 
+            }
+
+            .mute-button:hover {
+                background-color: rgba(0, 0, 0, 0.9);
+                transform: scale(1.1);
+            }
+
+            .mute-button i {
+                font-size: 20px;
+            }
+
+            @media (max-width: 768px) {
+                .volume-slider-container {
+                    bottom: 50px;  
+                    left: 10px;   
+                    padding: 8px 15px;  
+                }
+
+                .volume-slider {
+                    width: 150px;  
+                }
+
+                .mute-button {
+                    width: 35px;   
+                    height: 35px;
+                    font-size: 18px; 
+                }
+            }
+
+        .show-video-btn {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            font-size: 18px;
+            z-index: 10;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: -25px;
+            transform-origin: top center;
+        }
+
+        .show-video-btn:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        .show-video-btn i {
+            font-size: 20px;
+        }
+
+        .social-buttons {
+            position: fixed; 
+            bottom: 100px;    
+            right: 20px;      
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .social-buttons a {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 12px;
+            border-radius: 50%;
+            text-align: center;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 22px;
+        }
+
+        .social-buttons a:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .social-buttons {
+                bottom: 70px;  
+                right: 10px;  
+            }
+
+            .social-buttons a {
+                width: 40px;   
+                height: 40px;
+                font-size: 18px;
+            }
+        }
+
+
+        .hidden-ui {
+            opacity: 0;
+            visibility: hidden; 
+            pointer-events: none; 
+            transition: opacity 0.5s ease, visibility 0s 0.5s; 
+        }
+
+
+        .ui-element {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all;
+        }
+
+        .show-ui {
+            display: block;
+            opacity: 1;
+        }
+
+
+        .tipp-box {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;                     
+            color: white;                           
+            font-size: 1rem;                       
+            position: absolute;                    
+            bottom: 70px;                          
+            left: 50%;                              
+            transform: translateX(-50%);           
+            max-width: 800px;                       
+            width: 90%;                            
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); 
+            pointer-events: auto;                   
+            z-index: 10;                           
+            border-radius: 8px;
+        }
+
+        #tipp-text {
+            font-size: 1rem;                       
+            font-weight: 500;                       
+            text-align: center;
+        }
+
+        #team-member-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 1.5rem; 
+            font-weight: bold;
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            text-align: center;
+        }
+
+        #team-member-image {
+            width: 64px;  
+            height: 64px; 
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        #team-member-name {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        #team-member-role {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        #team-modal ul {
+            max-height: calc(5 * 80px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        #team-modal ul::-webkit-scrollbar {
+            width: 8px;
+        }
+        #team-modal ul::-webkit-scrollbar-thumb {
+            background-color: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+
+
+    </style>
+</head>
+<body class="text-white h-screen">
+
+    <video class="bg-video" autoplay loop playsinline id="bg-video">
+        <source src="video\background.mp4" type="video/mp4">
+        Dein Browser unterstützt keine Videos.
+    </video>
+
+    <img src="img\server_logo.png" alt="Server Logo" class="server-logo" />
+
+    <button id="show-video" class="show-video-btn">
+        <i id="show-video-icon" class="fas fa-eye"></i>
+    </button>
+
+    <div class="volume-slider-container">
+        <button id="mute-button" class="mute-button">
+            <i id="mute-icon" class="fas fa-volume-mute"></i>
+        </button>
+    
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.0" class="volume-slider" />
+    </div>
+    
+
+    <div class="social-buttons">
+        <a href="#" onclick="openLink('https://www.tiktok.com')">
+            <i class="fab fa-tiktok"></i>
+        </a>
+        <a href="#" onclick="openLink('https://discord.com')">
+            <i class="fab fa-discord"></i>
+        </a>
+        <a href="#" onclick="openLink('https://www.youtube.com')">
+            <i class="fab fa-youtube"></i>
+        </a>
+    </div>
+    
+    <div class="tipp-box" id="tipp-box">
+        <p id="tipp-text">Tipp wird geladen...</p>
+    </div>
+    
+
+    <div class="fixed top-6 right-6 z-50">
+        <button id="open-team-modal" class="w-12 h-12 bg-black bg-opacity-60 text-white rounded-full flex items-center justify-center hover:scale-110 hover:bg-opacity-80">
+          <i class="fas fa-users text-lg"></i>
+        </button>
+      </div>
+      
+      <div id="team-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 w-11/12 max-w-md max-h-[80vh] overflow-y-auto shadow-2xl relative text-white">
+        
+            <button id="close-team-modal" class="absolute top-4 right-4 text-white/60 hover:text-white transition">
+                <i class="fas fa-times"></i>
+            </button>
+        
+            <h2 class="text-xl font-semibold text-center mb-4">Unser Team</h2>
+            
+            <ul id="team-list" class="space-y-4 max-h-[400px] overflow-y-auto">
+
+            </ul>
+        
+        </div>
+    </div>
+    
+
+    <script>
+        const video = document.getElementById('bg-video');
+        const volumeSlider = document.getElementById('volume-slider');
+        const muteButton = document.getElementById('mute-button');
+        const muteIcon = document.getElementById('mute-icon');
+    
+        let lastVolume = 0.5;
+    
+        video.volume = 0;
+        video.muted = true;
+        volumeSlider.value = 0;
+        muteIcon.className = 'fas fa-volume-mute';
+    
+        volumeSlider.addEventListener('input', () => {
+            const volume = parseFloat(volumeSlider.value);
+            video.volume = volume;
+    
+            if (volume === 0) {
+                video.muted = true;
+                muteIcon.className = 'fas fa-volume-mute';
+            } else {
+                video.muted = false;
+                lastVolume = volume;
+                muteIcon.className = 'fas fa-volume-up';
+            }
+        });
+    
+        muteButton.addEventListener('click', () => {
+            if (video.muted || video.volume === 0) {
+                video.muted = false;
+                video.volume = lastVolume || 0.5;
+                volumeSlider.value = video.volume;
+                muteIcon.className = 'fas fa-volume-up';
+            } else {
+                lastVolume = video.volume;
+                video.muted = true;
+                video.volume = 0;
+                volumeSlider.value = 0;
+                muteIcon.className = 'fas fa-volume-mute';
+            }
+        });
+    </script>
+    
+
+    <script>
+        function openLink(url) {
+            window.invokeNative('openUrl', url);
+        }
+    </script>
+
+    <script>
+        const showVideoButton = document.getElementById('show-video');
+        const uiElements = document.querySelectorAll('.mute-button-container, .social-buttons, #tipp-box, #open-team-modal, .server-logo, .volume-slider-container'); 
+
+        showVideoButton.addEventListener('click', function() {
+            const isVisible = !uiElements[0].classList.contains('hidden-ui'); 
+
+            if (isVisible) {
+                uiElements.forEach(element => {
+                    element.classList.add('hidden-ui'); 
+                });
+                showVideoButton.setAttribute('title', 'Video anzeigen');
+                document.getElementById('show-video-icon').classList.remove('fa-eye');
+                document.getElementById('show-video-icon').classList.add('fa-eye-slash');
+            } else {
+                uiElements.forEach(element => {
+                    element.classList.remove('hidden-ui'); 
+                });
+                showVideoButton.setAttribute('title', 'Video ausblenden');
+                document.getElementById('show-video-icon').classList.remove('fa-eye-slash');
+                document.getElementById('show-video-icon').classList.add('fa-eye');
+            }
+        });
+
+
+    </script>
+
+    <script>
+        fetch('tipps.json')
+        .then(response => response.json())
+        .then(tipps => {
+            let index = 0;
+            const tippBox = document.getElementById('tipp-text');
+            const progressBar = document.getElementById('progress-bar');
+            const totalTipps = tipps.length;
+
+            function showNextTipp() {
+            if (index < totalTipps) {
+                tippBox.textContent = tipps[index];
+                progressBar.style.width = ((index + 1) / totalTipps * 100) + '%';
+                index++;
+            } else {
+                let index = 0;
+            }
+            }
+
+            showNextTipp();
+
+            setInterval(showNextTipp, 5000);
+        });
+    </script>
+
+    <script>
+        async function loadTeam() {
+            try {
+                const response = await fetch('team.json');
+                const team = await response.json();
+                const teamList = document.getElementById('team-list');
+
+                teamList.innerHTML = ''; 
+
+                team.forEach(member => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center gap-3';
+                    li.innerHTML = `
+                        <img src="${member.image}" class="w-10 h-10 rounded-full border border-white/20" />
+                        <div>
+                            <p class="text-sm font-medium">${member.name}</p>
+                            <p class="text-xs text-white/70">${member.role}</p>
+                        </div>
+                    `;
+                    teamList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Fehler beim Laden der Teamdaten:', error);
+            }
+        }
+
+        document.getElementById('open-team-modal').addEventListener('click', () => {
+            document.getElementById('team-modal').classList.remove('hidden');
+            loadTeam(); 
+        });
+
+        document.getElementById('close-team-modal').addEventListener('click', () => {
+            document.getElementById('team-modal').classList.add('hidden');
+        });
+    </script>
+
+</body>
+</html>
